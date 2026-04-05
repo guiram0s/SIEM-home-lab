@@ -1,6 +1,6 @@
 # Active Directory & Wazuh SIEM Home Lab: Attack and Detection
 
-## Table of Contents
+## Index
 - [Project Overview](#project-overview)
 - [Architecture & Prerequisites](#architecture--prerequisites)
 - [Step 1: Base VM Installation](#step-1-base-vm-installation)
