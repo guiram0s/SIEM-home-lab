@@ -9,6 +9,7 @@
 - [Step 4: Joining the Client to the Domain](#step-4-joining-the-client-to-the-domain)
 - [Step 5: Deploying the Wazuh Agents](#step-5-deploying-the-wazuh-agents)
 - [Step 6: Attack Simulation & Detection](#step-6-attack-simulation--detection)
+- [Step 7: Attack Simulation & Detection (Brute-Force)](#step-7-attack-simulation--detection-brute-force)
 
 ---
 
@@ -205,3 +206,51 @@ We will simulate an attacker attempting to cover their tracks by wiping the Wind
 **Why the alert was buried:** Even though the alert was generated (`wazuh-alerts-*`), it did not trigger a loud warning on the main Overview page. Wazuh scores alerts from Level 0 to 15. Out of the box, Rule ID 60106 ("Windows Audit Log Cleared") is only a Level 3 severity. It was quietly filed away with hundreds of other low-severity logs. 
 
 To prevent attackers from slipping through, we could perform **SIEM Tuning**. We could modify the backend code to elevate this rule to a Level 12 (High Severity), ensuring future log deletions trigger an immediate investigation.
+
+## Step 7: Attack Simulation & Detection (Brute-Force)
+
+### The Setup: Simulating a Realistic Corporate Network
+To test the network's defenses realistically, we verified connectivity from a separate physical attack machine (Kali Linux) bridged to the same local network. While the Kali machine could ping the Wazuh server, the Windows 10 Client silently dropped the ICMP (ping) requests. This is default Windows Defender Firewall behavior.
+
+However, in an actual enterprise environment, computers must communicate over specific ports to share files and pull Group Policy updates from the Domain Controller. To accurately simulate this, we explicitly opened Port 445 (SMB) on the Windows 10 Client while leaving the rest of the firewall active.
+
+**PowerShell Command (Executed as Admin on the Client):**
+```powershell
+Enable-NetFirewallRule -DisplayGroup "File and Printer Sharing"
+```
+**The Attack: Targeted SMB Brute-Force**
+
+Hackers understand that Port 445 is routinely open on corporate networks, making it a prime target for protocol-level brute-force attacks.
+
+Instead of using a massive, noisy wordlist like `rockyou.txt` (which would trigger Active Directory's account lockout policy after a few failed attempts), a targeted dictionary (`passwords.txt`) was created in Kali Linux containing four incorrect passwords and the correct Domain Admin password at the end.
+
+To execute the attack, we utilized **CrackMapExec**, a modern penetration testing tool designed specifically to interact with Active Directory environments (bypassing the outdated SMB engines found in tools like Hydra).
+
+**Attack Execution (Kali Linux):**
+
+```Bash
+crackmapexec smb 192.168.1.181 -u Administrator -p passwords.txt -d soclab
+```
+
+<img src="images/kalitest.png" alt="CrackMapExec Attack Execution" width="600">
+
+**The Detection: Hunting Active Directory Logons**
+To analyze the attack, we accessed the Wazuh SIEM Discover module and filtered the telemetry.
+
+***Troubleshooting Note:** If logs are missing, verify that the Domain Controller and Client VMs are not suffering from VM Time Drift. Using `w32tm /resync /force` ensures logs are accurately stamped and discoverable within the SIEM's "Last 15 minutes" window.*
+
+By querying for Windows Event ID 4625 (Failed Logon), a cluster of alerts appeared simultaneously, indicating automated script activity.
+
+<img src="images/wazuhalertz.png" alt="Wazuh Brute Force Alert Detection" width="600">
+
+**Forensic Artifacts Captured by the SIEM:**
+
+**The Victim:** agent.name: CLIENT01
+
+**The Target Account:** data.win.eventdata.targetUserName: Administrator
+
+**The Attacker Origin:** data.win.eventdata.ipAddress: 192.168.1.166 (The exact IP of the bridged Kali Linux machine).
+
+**The Action:** data.win.eventdata.subStatus: 0xc000006a (Windows hex code translating to "User name is correct, but password was wrong").
+
+Following the failed attempts, querying for Event ID 4624 (Successful Logon) confirmed the final password in the dictionary bypassed the authentication layer, providing absolute proof of the network breach.
