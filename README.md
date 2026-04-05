@@ -48,7 +48,7 @@ Running three operating systems simultaneously requires specific hardware specs:
 * Import the Wazuh OVA into VirtualBox and boot it up.
 * If Wazuh does not pull an IP address on the initial boot, run this command to force it to ask the router for an IP: `sudo systemctl restart systemd-networkd`.
 
-![Server Configuration](images/1wazuh.png)
+<img src="images/1wazuh.png" alt="Server Configuration" width="600">
 
 ### 2. Windows Server 2022 Setup
 * Create the VM using the standard VirtualBox procedure, but **unselect** "Proceed Unattended Installation" so you can manually configure it.
@@ -56,7 +56,7 @@ Running three operating systems simultaneously requires specific hardware specs:
 * Proceed with a Custom Install.
 * Set the administrator password to meet enterprise complexity requirements (1 uppercase, 1 lowercase, a number, and a symbol), such as `SOCAdmin2026!`.
 
-![Server Configuration](images/2server.png)
+<img src="images/2server.png" alt="Server Configuration" width="600">
 
 ### 3. Windows 10 Client Setup
 * Install **Windows 10 Pro or Enterprise** (the Home edition will not let you join a domain!!!) using the standard VirtualBox procedure.
@@ -75,7 +75,7 @@ Running three operating systems simultaneously requires specific hardware specs:
 * For the **Preferred DNS server**, type `127.0.0.1` (the loopback address).
 * Click OK and close the network windows.
 
-![Server Configuration](images/3server.png)
+<img src="images/3server.png" alt="Server Configuration" width="600">
 
 ### 2. Rename the Server
 * In Server Manager, click the blue generated computer name (e.g., `WIN-HV8UON6CURC`) next to **Computer name**.
@@ -93,7 +93,7 @@ Running three operating systems simultaneously requires specific hardware specs:
 * Check the box for **Active Directory Domain Services**.
 * Click **Add Features** on the pop-up, click Next to the end, and click **Install**.
 
-![Server Configuration](images/4ad.png)
+<img src="images/4ad.png" alt="Server Configuration" width="600">
 
 ### 2. Promote to Domain Controller
 * Click the yellow warning triangle at the top of Server Manager and click **Promote this server to a domain controller**.
@@ -107,7 +107,7 @@ Running three operating systems simultaneously requires specific hardware specs:
 * The server will automatically reboot. 
 * Upon reboot, the login screen will change from "Administrator" to `SOCLAB\Administrator`, confirming the domain is active.
 
-![Server Configuration](images/5soclab.png)
+<img src="images/5soclab.png" alt="Server Configuration" width="600">
 
 ---
 
@@ -144,8 +144,8 @@ Optional: You can also change the Computer name here to something like CLIENT01.
 * **User name:** Type `SOCLAB\Administrator` (the domain prefix is required to prevent logging into the local machine account).
 * Type the server password and log in.
 
-![Server Configuration](images/6login.png)
-![Server Configuration](images/7login.png)
+<img src="images/6login.png" alt="Server Configuration" width="600">
+<img src="images/7login.png" alt="Server Configuration" width="600">
 
 ---
 
@@ -159,12 +159,12 @@ Wazuh acts as the SIEM interface, but we need to install an agent on the Windows
 2. In the URL bar, type `https://` followed by the Wazuh server's IP (e.g., `https://192.168.1.50`).
 3. Bypass the security warning (Advanced -> Proceed) and log in with username `admin` and password `admin`.
 
-![Wazuh Agent Deployment](images/8wazuhlogin.png)
+<img src="images/8wazuhlogin.png" alt="Server Configuration" width="600">
 
 4. Click on the **Agents** section on the dashboard and click **Deploy new agent**.
 5. Select **Windows** and input the Wazuh server's IP address.
 
-![Wazuh Agent Deployment](images/9wazuhlogin.png)
+<img src="images/9wazuhlogin.png" alt="Server Configuration" width="600">
 
 6. Copy the installation command block generated in Step 4 of the wizard.
 7. Open **PowerShell as Administrator** on the Windows 10 VM.
@@ -173,7 +173,7 @@ Wazuh acts as the SIEM interface, but we need to install an agent on the Windows
 10. Verify the connection by going to the main Wazuh dashboard -> **Agents**. The machine should appear as **Active**.
 11. Repeat this exact process on the **Windows Server** VM.
 
-![Wazuh Agent Deployment](images/10wazuhlogin.png)
+<img src="images/10wazuhlogin.png" alt="Server Configuration" width="600">
 
 ---
 
@@ -188,7 +188,7 @@ We will simulate an attacker attempting to cover their tracks by wiping the Wind
 ### The Detection
 1. Open the Wazuh web dashboard, click the hamburger menu, and navigate to **Discover**.
 
-![Wazuh Agent Deployment](images/11wazuhlogin.png)
+<img src="images/11wazuhlogin.png" alt="Server Configuration" width="600">
 
 2. Search for `1102` (the Windows Event ID for cleared audit logs).
 3. The log successfully captures the event, showing:
@@ -196,8 +196,8 @@ We will simulate an attacker attempting to cover their tracks by wiping the Wind
    * `Account Name: Administrator`
    * `Domain Name: SOCLAB`
    * `data.win.system.message: "The audit log was cleared."`
-
-![Wazuh Agent Deployment](images/12wazuhlogin.png)
+     
+<img src="images/12wazuhlogin.png" alt="Server Configuration" width="600">
 
 ### Analysis & SIEM Tuning
 **Why the command didn't show:** Searching for the specific string `wevtutil` yields zero results. Out of the box, Windows records the action (Event 1102), but not the specific command typed to execute it. To fix this blind spot, a SOC Analyst must enable the "Audit Process Creation with Command Line" Group Policy on the server.
