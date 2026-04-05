@@ -1,14 +1,14 @@
 # Active Directory & Wazuh SIEM Home Lab: Attack and Detection
 
 ## Table of Contents
-- [Project Overview](#-project-overview)
-- [Architecture & Prerequisites](#-architecture--prerequisites)
-- [Step 1: Base VM Installation](#-step-1-base-vm-installation)
-- [Step 2: Windows Server Configuration](#-step-2-windows-server-configuration)
-- [Step 3: Active Directory Installation & Promotion](#-step-3-active-directory-installation--promotion)
-- [Step 4: Joining the Client to the Domain](#-step-4-joining-the-client-to-the-domain)
-- [Step 5: Deploying the Wazuh Agents](#-step-5-deploying-the-wazuh-agents)
-- [Step 6: Attack Simulation & Detection](#-step-6-attack-simulation--detection)
+- [Project Overview](#project-overview)
+- [Architecture & Prerequisites](#architecture--prerequisites)
+- [Step 1: Base VM Installation](#step-1-base-vm-installation)
+- [Step 2: Windows Server Configuration](#step-2-windows-server-configuration)
+- [Step 3: Active Directory Installation & Promotion](#step-3-active-directory-installation--promotion)
+- [Step 4: Joining the Client to the Domain](#step-4-joining-the-client-to-the-domain)
+- [Step 5: Deploying the Wazuh Agents](#step-5-deploying-the-wazuh-agents)
+- [Step 6: Attack Simulation & Detection](#step-6-attack-simulation--detection)
 
 ---
 
