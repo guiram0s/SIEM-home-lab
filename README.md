@@ -210,6 +210,7 @@ To prevent attackers from slipping through, we could perform **SIEM Tuning**. We
 ## Step 7: Attack Simulation & Detection (Brute-Force)
 
 ### The Setup: Simulating a Realistic Corporate Network
+
 To test the network's defenses realistically, we verified connectivity from a separate physical attack machine (Kali Linux) bridged to the same local network. While the Kali machine could ping the Wazuh server, the Windows 10 Client silently dropped the ICMP (ping) requests. This is default Windows Defender Firewall behavior.
 
 However, in an actual enterprise environment, computers must communicate over specific ports to share files and pull Group Policy updates from the Domain Controller. To accurately simulate this, we explicitly opened Port 445 (SMB) on the Windows 10 Client while leaving the rest of the firewall active.
@@ -235,6 +236,7 @@ crackmapexec smb 192.168.1.181 -u Administrator -p passwords.txt -d soclab
 <img src="images/kalitest.png" alt="CrackMapExec Attack Execution" width="600">
 
 **The Detection: Hunting Active Directory Logons**
+
 To analyze the attack, we accessed the Wazuh SIEM Discover module and filtered the telemetry.
 
 ***Troubleshooting Note:** If logs are missing, verify that the Domain Controller and Client VMs are not suffering from VM Time Drift. Using `w32tm /resync /force` ensures logs are accurately stamped and discoverable within the SIEM's "Last 15 minutes" window.*
